@@ -32,9 +32,10 @@ export default class PostsScreen extends React.Component {
   }
 
   getPhotos() {
+    const { navigate } = this.props.navigation;
     CameraRoll.getPhotos({ first: 20, assetType: 'All' })
       .then(res => {
-        console.log(res.edges);
+        navigate('SelectPhoto', {photoArray: res.edges})
       })
   }
 
