@@ -4,17 +4,23 @@ import {
   Text,
   View,
   Image,
-  FlatList,
+  ListView,
   TouchableOpacity,
   CameraRoll,
+  Dimensions
 } from 'react-native';
 
+const { width } = Dimensions.get('window');
 export default class PostsScreen extends React.Component {
   static navigationOptions = {
     title: 'Posts',
+    headerLeft: null
   };
 
-  state = { 
+  state = {
+    ds: new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2
+    }), 
     profile: {},
     posts: []
   };
@@ -46,11 +52,11 @@ export default class PostsScreen extends React.Component {
           <Image style={styles.image} source={{uri: this.state.profile.profile_picture}} />
           <Text>@{this.state.profile.username}</Text>
         </View>
-        <FlatList
-          data={this.state.posts}
-          numColumns={3}
-          contentContainerStyle={styles.posts}
-          renderItem={({item}) => <Image style={{width: 125, height: 125, alignItems: 'center',}} source={{uri: item.images.thumbnail.url}} />}
+        <ListView
+          contentContainerStyle={styles.list}
+          dataSource={this.state.ds.cloneWithRows(this.state.posts)}
+          renderRow={(rowData) => <Image style={{width: width / 3, height: width / 3, alignItems: 'center',}} source={{uri: rowData.images.thumbnail.url}} />}
+          enableEmptySections={true}
         />
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => this.getPhotos()}>
@@ -74,7 +80,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
-  posts: {},
+  list: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
   container: {
     flex: 1,
     justifyContent: 'space-around',
